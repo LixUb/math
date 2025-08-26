@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Matematika - Faktorial, Permutasi & Kombinasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .calculator-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 6px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .calculator-content {
+            display: none;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .calculator-content.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: white;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            margin-bottom: 24px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #f0fff4, #e6fffa);
+            border: 2px solid #9ae6b4;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h3 {
+            color: #2f855a;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+
+        .result-calculation {
+            color: #4a5568;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        .formula-info {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .formula-info h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .formula-info p {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            border: 2px solid #fc8181;
+            color: #9b2c2c;
+        }
+
+        .two-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .two-inputs {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .tab {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <h1>Kalkulator Matematika</h1>
+        <p class="subtitle">Hitung Faktorial, Permutasi & Kombinasi dengan mudah</p>
+        
+        <div class="calculator-tabs">
+            <div class="tab active" onclick="switchTab('factorial')">Faktorial</div>
+            <div class="tab" onclick="switchTab('permutation')">Permutasi</div>
+            <div class="tab" onclick="switchTab('combination')">Kombinasi</div>
+        </div>
+
+        <!-- Faktorial Calculator -->
+        <div id="factorial" class="calculator-content active">
+            <div class="input-group">
+                <label for="factorialInput">Masukkan angka (n):</label>
+                <input type="number" id="factorialInput" placeholder="Contoh: 5" min="0" max="170">
+            </div>
+            <button class="calculate-btn" onclick="calculateFactorial()">Hitung Faktorial</button>
+            <div id="factorialResult" class="result"></div>
+            <div class="formula-info">
+                <h4>Formula: n!</h4>
+                <p>Faktorial dari n adalah hasil perkalian semua bilangan bulat positif dari 1 hingga n. Contoh: 5! = 5 × 4 × 3 × 2 × 1 = 120</p>
+            </div>
+        </div>
+
+        <!-- Permutasi Calculator -->
+        <div id="permutation" class="calculator-content">
+            <div class="two-inputs">
+                <div class="input-group">
+                    <label for="permutationN">Total objek (n):</label>
+                    <input type="number" id="permutationN" placeholder="Contoh: 7" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="permutationR">Objek dipilih (r):</label>
+                    <input type="number" id="permutationR" placeholder="Contoh: 3" min="0">
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculatePermutation()">Hitung Permutasi</button>
+            <div id="permutationResult" class="result"></div>
+            <div class="formula-info">
+                <h4>Formula: P(n,r) = n! / (n-r)!</h4>
+                <p>Permutasi adalah cara mengatur r objek dari n objek dimana urutan penting. Contoh: P(7,3) = 7! / (7-3)! = 7! / 4! = 210</p>
+            </div>
+        </div>
+
+        <!-- Kombinasi Calculator -->
+        <div id="combination" class="calculator-content">
+            <div class="two-inputs">
+                <div class="input-group">
+                    <label for="combinationN">Total objek (n):</label>
+                    <input type="number" id="combinationN" placeholder="Contoh: 10" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="combinationR">Objek dipilih (r):</label>
+                    <input type="number" id="combinationR" placeholder="Contoh: 4" min="0">
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateCombination()">Hitung Kombinasi</button>
+            <div id="combinationResult" class="result"></div>
+            <div class="formula-info">
+                <h4>Formula: C(n,r) = n! / (r! × (n-r)!)</h4>
+                <p>Kombinasi adalah cara memilih r objek dari n objek dimana urutan tidak penting. Contoh: C(10,4) = 10! / (4! × 6!) = 210</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all calculator contents
+            const contents = document.querySelectorAll('.calculator-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected content and activate tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Hide all results
+            hideAllResults();
+        }
+
+        function hideAllResults() {
+            const results = document.querySelectorAll('.result');
+            results.forEach(result => {
+                result.classList.remove('show');
+            });
+        }
+
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function calculateFactorial() {
+            const input = document.getElementById('factorialInput');
+            const resultDiv = document.getElementById('factorialResult');
+            const n = parseInt(input.value);
+
+            if (isNaN(n) || n < 0) {
+                showError(resultDiv, 'Mohon masukkan bilangan bulat non-negatif!');
+                return;
+            }
+
+            if (n > 170) {
+                showError(resultDiv, 'Angka terlalu besar! Maksimal 170.');
+                return;
+            }
+
+            const result = factorial(n);
+            const calculation = n === 0 ? '0! = 1' : generateFactorialString(n);
+            
+            showResult(resultDiv, 'Hasil Faktorial', result, calculation);
+        }
+
+        function generateFactorialString(n) {
+            if (n <= 10) {
+                let str = n + '! = ';
+                for (let i = n; i >= 1; i--) {
+                    str += i + (i > 1 ? ' × ' : '');
+                }
+                return str;
+            } else {
+                return n + '! = ' + n + ' × ' + (n-1) + ' × ... × 2 × 1';
+            }
+        }
+
+        function calculatePermutation() {
+            const nInput = document.getElementById('permutationN');
+            const rInput = document.getElementById('permutationR');
+            const resultDiv = document.getElementById('permutationResult');
+            
+            const n = parseInt(nInput.value);
+            const r = parseInt(rInput.value);
+
+            if (isNaN(n) || isNaN(r) || n < 0 || r < 0) {
+                showError(resultDiv, 'Mohon masukkan bilangan bulat non-negatif!');
+                return;
+            }
+
+            if (r > n) {
+                showError(resultDiv, 'r tidak boleh lebih besar dari n!');
+                return;
+            }
+
+            if (n > 170) {
+                showError(resultDiv, 'Angka terlalu besar! Maksimal 170.');
+                return;
+            }
+
+            const result = factorial(n) / factorial(n - r);
+            const calculation = `P(${n},${r}) = ${n}! / (${n}-${r})! = ${n}! / ${n-r}!`;
+            
+            showResult(resultDiv, 'Hasil Permutasi', result, calculation);
+        }
+
+        function calculateCombination() {
+            const nInput = document.getElementById('combinationN');
+            const rInput = document.getElementById('combinationR');
+            const resultDiv = document.getElementById('combinationResult');
+            
+            const n = parseInt(nInput.value);
+            const r = parseInt(rInput.value);
+
+            if (isNaN(n) || isNaN(r) || n < 0 || r < 0) {
+                showError(resultDiv, 'Mohon masukkan bilangan bulat non-negatif!');
+                return;
+            }
+
+            if (r > n) {
+                showError(resultDiv, 'r tidak boleh lebih besar dari n!');
+                return;
+            }
+
+            if (n > 170) {
+                showError(resultDiv, 'Angka terlalu besar! Maksimal 170.');
+                return;
+            }
+
+            const result = factorial(n) / (factorial(r) * factorial(n - r));
+            const calculation = `C(${n},${r}) = ${n}! / (${r}! × (${n}-${r})!) = ${n}! / (${r}! × ${n-r}!)`;
+            
+            showResult(resultDiv, 'Hasil Kombinasi', result, calculation);
+        }
+
+        function showResult(resultDiv, title, value, calculation) {
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <div class="result-value">${formatNumber(value)}</div>
+                <div class="result-calculation">${calculation}</div>
+            `;
+            resultDiv.className = 'result show';
+        }
+
+        function showError(resultDiv, message) {
+            resultDiv.innerHTML = `
+                <h3>Error</h3>
+                <div class="result-value">${message}</div>
+            `;
+            resultDiv.className = 'result show error';
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString('id-ID');
+        }
+
+        // Add enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeTab = document.querySelector('.tab.active').onclick;
+                if (activeTab) {
+                    const tabName = activeTab.toString().match(/switchTab\('(\w+)'\)/)[1];
+                    if (tabName === 'factorial') calculateFactorial();
+                    else if (tabName === 'permutation') calculatePermutation();
+                    else if (tabName === 'combination') calculateCombination();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
